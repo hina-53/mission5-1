@@ -7,9 +7,9 @@
 <body>
 <?php
 //ＤＢ接続設定
-    $dsn = 'mysql:dbname=tb******db;host=localhost';
-	$user = 'tb-******';
-	$password = 'PASSWORD';
+    $dsn = 'mysql:dbname=tb220135db;host=localhost';
+	$user = 'tb-220135';
+	$password = 'JeNzeYbcgL';
 	$pdo = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
 	
 	    
@@ -24,12 +24,6 @@
 	.");";
 	$stmt = $pdo->query($sql);
 	
-	/*$sql ='SHOW CREATE TABLE tbtest_51';
-	$result = $pdo -> query($sql);
-	foreach ($result as $row){
-		echo $row[1];
-	}
-	echo "<hr>";*/
 	
 //変数指定
 if (!empty($_POST["name"])) {
@@ -60,19 +54,40 @@ if (!empty($_POST["editpass"])) {
     $editpass=$_POST["editpass"];
 }
 
+//削除機能 
+   
+    if (!empty($delete)){ 
+      if(!empty($deletepass)){
+            if($delete!= $id){    
+    
+    $id =$delete;
+   $sql = 'delete from tbtest_51 where id=:id';
+   $stmt = $pdo->prepare($sql);
+   $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+   $stmt->execute();
+}
+}
+}
+
+	//続けて、4-6の SELECTで表示させる機能 も記述し、表示もさせる。
+		$id =$delete; // idがこの値のデータだけを抽出したい、とする
+
+$sql = 'SELECT * FROM tbtest_51 WHERE id=:id ';
+$stmt = $pdo->prepare($sql);                  
+$stmt->bindParam(':id', $id, PDO::PARAM_INT); 
+$stmt->execute();                             
+$results = $stmt->fetchAll(); 
+	foreach ($results as $row){
+		//$rowの中にはテーブルのカラム名が入る
+		echo $row['id'].',';
+		echo $row['name'].',';
+		echo $row['comment'].',';
+		echo $row['date'].'<br>';
+	echo "<hr>";
+	}
+
+
 //編集、投稿機能
-/*//以下3-5
-     $lines=file($filename,FILE_IGNORE_NEW_LINES);
-      $fp=fopen($filename,"w");
-      foreach($lines as $line){
-      $form=explode("<>",$line);
-        if($form[0]==$editNO && $form[4] ==$password){//投稿番号＝編集番号,投稿＝パスワード
-         fwrite($fp, $editNO . "<>" . $name . "<>" . $comment . "<>" . $date . "\n");
-        }else{ //投稿番号＝編集番号ではないとき
-         fwrite($fp,$form[0]."<>".$form[1]."<>".$form[2]."<>".$form[3].PHP_EOL);
-        }
-        }
-        fclose($fp);*/
 if(!empty($_POST["name"]) && !empty($_POST["comment"]) && !empty($_POST["password"])){ //名前、コメントが空ではないとき
      if(!empty($_POST["editNO"])){//編集番号が空ではないとき
        $date = date("Y年m月d日H時i分s秒");
@@ -84,21 +99,6 @@ if(!empty($_POST["name"]) && !empty($_POST["comment"]) && !empty($_POST["passwor
 	   $stmt->bindParam(':date', $date, PDO::PARAM_STR);
 	   $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 	   $stmt->execute();
-	   
-	/*if($row['id']==$editNO && $row['password']==$password){//投稿番号＝編集番号,パスワードが一致
-    $sql = 'SELECT * FROM tbtest_51 WHERE id=:id ';
-    $stmt = $pdo->prepare($sql);                  
-    $stmt->bindParam(':id', $id, PDO::PARAM_INT); 
-    $stmt->execute();                             
-    $results = $stmt->fetchAll(); 
-	foreach ($results as $row){
-		echo $row['id'].',';
-		echo $row['name'].',';
-		echo $row['comment'].',';
-	    echo $row['date'].'<br>';
-		
-	echo "<hr>";
-	}*/
 
 }else{//投稿機能 
         $date = date("Y年m月d日H時i分s秒"); 
@@ -124,59 +124,11 @@ if(!empty($_POST["name"]) && !empty($_POST["comment"]) && !empty($_POST["passwor
         echo $row['date'].'<br>';
     echo "<hr>";
 	}
+
 	
-   //削除機能 
-   /*if(!empty($delete) && !empty($deletepass)){//削除フォームに入力がある場合，テーブルのデータを呼び出し配列にする
-        $sql = 'SELECT * FROM tbtest_51'; //テーブル名を自分のものに変えてください
-        $stmt = $pdo->query($sql);
-        $results = $stmt->fetchAll();
-        foreach($results as $row){ //ここまででテーブル内のデータを呼び出した状態
-            if($row['id']==$delete){ //該当投稿ならば
-                if($row['password']==$deletepass){ //パスワードを照会
-                    $sql = 'delete from tbtest_51 where id=:id';    
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-                    $stmt->execute();
-                }
-            }
-        }
-    }*/
-   /*if (empty($delete)){
-    } else {  //削除指定が空ではない時
-         if(empty($deletepass)){
-         echo "Error!!";
-    }  else{*/
-    if(!empty($delete)){
-       if(!empty($deletepass)){
-            if($delete!= id){    
+  
     
-    $id =$delete;
-   $sql = 'delete from tbtest_51 where id=:id';
-   $stmt = $pdo->prepare($sql);
-   $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-   $stmt->execute();
-
-
-	//続けて、4-6の SELECTで表示させる機能 も記述し、表示もさせる。
-		$id =$delete; // idがこの値のデータだけを抽出したい、とする
-
-$sql = 'SELECT * FROM tbtest_51 WHERE id=:id ';
-$stmt = $pdo->prepare($sql);                  // ←差し替えるパラメータを含めて記述したSQLを準備し、
-$stmt->bindParam(':id', $id, PDO::PARAM_INT); // ←その差し替えるパラメータの値を指定してから、
-$stmt->execute();                             // ←SQLを実行する。
-$results = $stmt->fetchAll(); 
-	foreach ($results as $row){
-		//$rowの中にはテーブルのカラム名が入る
-		echo $row['id'].',';
-		echo $row['name'].',';
-		echo $row['comment'].',';
-		echo $row['date'].'<br>';
-	echo "<hr>";
-	}
     
-            }
-     }
-    }
   
 //編集選択機能
         if(!empty($_POST["edit"])){ //編集対象番号が空ではなかったら
